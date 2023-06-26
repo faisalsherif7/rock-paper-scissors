@@ -1,9 +1,62 @@
 // Initialize player scores
 let playerScore = 0;
 let computerScore = 0;
+let result = 'string';
 
-// Play!
-game();
+const div = document.querySelector('.results');
+const currentResult = document.querySelector('.currentResult');
+const score = document.querySelector('.score');
+const buttons = document.querySelectorAll('button');
+
+const reload = document.createElement('button')
+reload.style.display = 'block';
+reload.textContent = 'Refresh to play again';
+
+
+
+buttons.forEach(button => button.addEventListener('click', (e) => {
+    result = playRound(e.target.classList.value, getComputerChoice());
+    currentResult.textContent = result;
+    updateScore();
+    score.textContent = `Player score - ${playerScore} || Computer score - ${computerScore}`;
+    if (playerScore >= 5 || computerScore >= 5) {
+        if (playerScore > computerScore) {
+            div.textContent = `You win! You beat the computer by ${playerScore} to ${computerScore}!`
+        }
+        else if (computerScore > playerScore) {
+            div.textContent = `You lose! The computer beat you by ${computerScore} to ${playerScore}!`
+        }
+
+        // Disable R/P/S buttons and show refresh button
+        buttons.forEach(button => button.disabled = true);
+        div.appendChild(reload);
+
+        // Reset scores after displaying results
+        playerScore = 0;
+        computerScore = 0;
+    }
+}));
+
+reload.addEventListener('click', () => location.reload());
+
+function updateScore() {
+    // If draw, continue
+    if (result.slice(0, 3) === 'Draw') {
+        return;
+    }
+
+    // If failure, increase computerScore
+    else if (result.slice(0, 8) === 'You lose') {
+        computerScore += 1;
+        return;
+    }
+
+    // If victory, increase playerScore
+    else if (result.slice(0, 7) === 'You win') {
+        playerScore += 1;
+        return;
+    }
+}
 
 
 function getComputerChoice() {
@@ -53,42 +106,5 @@ function playRound(playerSelection, computerSelection) {
     }
 }
 
-function game() {
 
-    // 5 loops
-    for (let i = 0; i < 5; i++) {
 
-        // Get selections
-        const playerSelection = prompt('Choose rock, paper or scissors!')
-        const computerSelection = getComputerChoice();
-
-        // Play a round
-        let result = playRound(playerSelection, computerSelection);
-
-        // If draw, continue
-        if (result.slice(0, 3) === 'Draw') {
-            continue;
-        }
-
-        // If failure, increase computerScore
-        else if (result.slice(0, 8) === 'You lose') {
-            computerScore += 1;
-        }
-
-        // If victory, increase playerScore
-        else if (result.slice(0, 7) === 'You win') {
-            playerScore += 1;
-        }
-    }
-
-    // Compare scores to check winner
-    if (playerScore > computerScore) {
-        return console.log(`You win! You beat the computer by ${playerScore} to ${computerScore}!`)
-    }
-    else if (computerScore > playerScore) {
-        return console.log(`You lose! The computer beat you by ${computerScore} to ${playerScore}!`)
-    }
-    else if (computerScore === playerScore) {
-        return console.log(`Draw! Both you and the computer scored ${playerScore}!`)
-    }
-}
